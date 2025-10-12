@@ -1,8 +1,9 @@
 { pkgs, lib, ... }:
-
+# cmd = "curl -s 'https://zenquotes.io/api/random' | jq -r '.[0].q'";
+# cmd = "nix-shell -p neo-cowsay --run \"curl -s 'https://zenquotes.io/api/random' | jq -r '.[0].q' | cowthink\"";
 {
   services.espanso = {
-    enable = true;
+    enable = false;
     
     configs = {
       default = {
@@ -81,8 +82,6 @@
             name = "quote";
             type = "shell";
             params = {
-                #                cmd = "curl -s 'https://zenquotes.io/api/random' | jq -r '.[0].q'";
-                #                cmd = "nix-shell -p neo-cowsay --run \"curl -s 'https://zenquotes.io/api/random' | jq -r '.[0].q' | cowthink\"";
               cmd = "${lib.getExe pkgs.curl} -s https://zenquotes.io/api/random | ${lib.getExe pkgs.jq} -r '.[0].q' | ${pkgs.neo-cowsay}/bin/cowthink";
             };
           }
