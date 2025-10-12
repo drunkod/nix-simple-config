@@ -29,13 +29,12 @@
     scrcpy
     audio-recorder
     xarchiver
-    libnotify 
+    libnotify
   ];
 
   # Programs
   programs = {
     home-manager.enable = true;
-    git.enable = true;
   };
 
 }
