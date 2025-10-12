@@ -14,7 +14,7 @@
         # Optional: Useful settings
         paste_shortcut = "CTRL+V";
         preserve_clipboard = true;
-        show_notifications = false;  # Disable since notifications don't work
+        show_notifications = true;  # Disable since notifications don't work
         
         # Performance tuning
         pre_paste_delay = 100;
