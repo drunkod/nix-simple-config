@@ -1,6 +1,13 @@
 { pkgs, lib, ... }:
 # cmd = "curl -s 'https://zenquotes.io/api/random' | jq -r '.[0].q'";
 # cmd = "nix-shell -p neo-cowsay --run \"curl -s 'https://zenquotes.io/api/random' | jq -r '.[0].q' | cowthink\"";
+let
+  # Define your variables here
+  userNameLong = "Alex-HP";
+  userNameShort = "Alex-HP";
+  userEmail = "alex@example.com";
+in
+
 {
   services.espanso = {
     enable = true;
@@ -64,11 +71,11 @@
               }
               {
                 trigger = ":mfg";
-                replace = "Mit freundlichen Grüßen\n{{userNameLong}}";
+                replace = "Mit freundlichen Grüßen\n${userNameLong}";
               }
               {
                 trigger = ":kr";
-                replace = "Kind regards\n{{userNameLong}}";
+                replace = "Kind regards\n${userNameLong}";
               }
               {
                 trigger = ":cp";
@@ -133,7 +140,7 @@
             matches = [
               {
                 trigger = ":gsign";
-                replace = "Signed-off-by: {{userNameLong}} <${userEmail}>";
+                replace = "Signed-off-by: ${userNameLong} <${userEmail}>";
               }
               {
                 trigger = ":ghrel";
