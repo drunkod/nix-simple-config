@@ -3,7 +3,7 @@
 # cmd = "nix-shell -p neo-cowsay --run \"curl -s 'https://zenquotes.io/api/random' | jq -r '.[0].q' | cowthink\"";
 {
   services.espanso = {
-    enable = false;
+    enable = true;
     
     configs = {
       default = {
@@ -31,45 +31,46 @@
       base = {
         matches = [
           # Test trigger - try this first!
-          {
-            trigger = ":test";
-            replace = "Espanso is working! 🎉";
-          }
-          
-          {
-            trigger = ":mydate";
-            replace = "{{mydate}}";
-            vars = [
-              {
-                name = "mydate";
-                type = "date";
-                params = {
-                  format = "%d.%m.%Y";
-                };
-              }
-            ];
-          }
+                    {
+                      trigger = ":test";
+                      replace = "Espanso is working! 🎉";
+                    }
+                    
+                    {
+                      trigger = ":mydate";
+                      replace = "{{mydate}}";
+                      vars = [
+                        {
+                          name = "mydate";
+                          type = "date";
+                          params = {
+                            format = "%d.%m.%Y";
+                          };
+                        }
+                      ];
+                    }
 
-          {
-            trigger = ":rand";
-            replace = "{{rand}}";
-            vars = [
-              {
-                name = "rand";
-                type = "random";
-                params.choices = [
-                  "Hey there!"
-                  "Hello, how are you?"
-                  "Hi, nice to see you!"
-                  "Greetings!"
-                  "Hey, what's up?"
-                  "Hello there!"
-                  "Hi friend!"
-                ];
-              }
-            ];
-          }
-        ];
+                    {
+                      trigger = ":rand";
+                      replace = "{{rand}}";
+                      vars = [
+                        {
+                          name = "rand";
+                          type = "random";
+                          params.choices = [
+                            "Hey there!"
+                            "Hello, how are you?"
+                            "Hi, nice to see you!"
+                            "Greetings!"
+                            "Hey, what's up?"
+                            "Hello there!"
+                            "Hi friend!"
+                          ];
+                        }
+                      ];
+                    }
+
+                  ];
       };
 
       greethings = {
@@ -82,7 +83,7 @@
             name = "quote";
             type = "shell";
             params = {
-              cmd = "${lib.getExe pkgs.curl} -s https://zenquotes.io/api/random | ${lib.getExe pkgs.jq} -r '.[0].q' | ${pkgs.neo-cowsay}/bin/cowthink";
+                cmd = "${lib.getExe pkgs.curl} -s https://zenquotes.io/api/random | ${lib.getExe pkgs.jq} -r '.[0].q' | ${pkgs.neo-cowsay}/bin/cowthink";
             };
           }
         ];
