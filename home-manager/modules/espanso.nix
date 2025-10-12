@@ -56,23 +56,23 @@
               }
               {
                 trigger = ":lgp";
-                replace = "Liebe Grüße\n${userNameShort}";
+                replace = "Liebe Grüße\n{{userNameShort}}";
               }
               {
                 trigger = ":glg";
-                replace = "Ganz liebe Grüße\n${userNameShort}";
+                replace = "Ganz liebe Grüße\n{{userNameShort}}";
               }
               {
                 trigger = ":mfg";
-                replace = "Mit freundlichen Grüßen\n${userNameLong}";
+                replace = "Mit freundlichen Grüßen\n{{userNameLong}}";
               }
               {
                 trigger = ":kr";
-                replace = "Kind regards\n${userNameLong}";
+                replace = "Kind regards\n{{userNameLong}}";
               }
               {
                 trigger = ":cp";
-                replace = "Cheers\n${userNameShort}";
+                replace = "Cheers\n{{userNameShort}}";
               }
               {
                 triggers = [
@@ -133,7 +133,7 @@
             matches = [
               {
                 trigger = ":gsign";
-                replace = "Signed-off-by: ${userNameLong} <${userEmail}>";
+                replace = "Signed-off-by: {{userNameLong}} <${userEmail}>";
               }
               {
                 trigger = ":ghrel";
@@ -271,7 +271,7 @@
                 replace = ''
                   Thanks a lot for your generous donation!
 
-                  Cheers ${userNameShort}
+                  Cheers {{userNameShort}}
                 '';
               }
             ];
