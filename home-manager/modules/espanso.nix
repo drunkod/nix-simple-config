@@ -3,19 +3,22 @@
     enable = true;
         configs = {
           default = {
-            # Espanso configuration
-            search_shortcut = "ALT+SPACE";
-            backend = "Clipboard";  # Note: Capital C
-            
-            # Add these settings
-            toggle_key = "CTRL+SHIFT+E";  # Key to enable/disable espanso
-            preserve_clipboard = true;
-            paste_shortcut = "CTRL+V";
-            
-            # If using X11
-            use_standard_includes = true;
-          };
-        };
+        search_shortcut = "ALT+SPACE";
+        
+        # Backend is correct for X11
+        backend = "Clipboard";
+        
+        # FIX: Remove or comment out toggle_key - the format was wrong
+        # toggle_key = "OFF";  # Set to OFF to disable, or use correct format
+        
+        # Optional: Useful settings
+        paste_shortcut = "CTRL+V";
+        preserve_clipboard = true;
+        show_notifications = false;  # Disable since notifications don't work
+        
+        # Performance tuning
+        pre_paste_delay = 100;
+        clipboard_threshold = 100;
     matches = {
 		base = {
           matches = [
