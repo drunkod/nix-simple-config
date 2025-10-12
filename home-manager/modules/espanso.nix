@@ -13,7 +13,7 @@ in
     enable = false;
     
     configs = {
-          default = {
+        default = {
             toggle_key = "ALT";
             keyboard_layout = {
                 layout = "us";
