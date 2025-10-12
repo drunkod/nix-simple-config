@@ -10,7 +10,7 @@ in
 
 {
   services.espanso = {
-    enable = false;
+    enable = true;
     
     configs = {
         default = {
