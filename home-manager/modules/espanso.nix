@@ -3,7 +3,7 @@
 # cmd = "nix-shell -p neo-cowsay --run \"curl -s 'https://zenquotes.io/api/random' | jq -r '.[0].q' | cowthink\"";
 {
   services.espanso = {
-    enable = true;
+    enable = false;
     
     configs = {
       default = {
