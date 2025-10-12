@@ -29,6 +29,7 @@
     scrcpy
     audio-recorder
     xarchiver
+    libnotify 
   ];
 
   # Programs
