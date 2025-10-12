@@ -1,9 +1,21 @@
 { pkgs, lib, ... }: {
   services.espanso = {
     enable = true;
-    configs = { default = { search_shortcut = "ALT+SPACE";
-backend = "clipboard";
- }; };
+        configs = {
+          default = {
+            # Espanso configuration
+            search_shortcut = "ALT+SPACE";
+            backend = "Clipboard";  # Note: Capital C
+            
+            # Add these settings
+            toggle_key = "CTRL+SHIFT+E";  # Key to enable/disable espanso
+            preserve_clipboard = true;
+            paste_shortcut = "CTRL+V";
+            
+            # If using X11
+            use_standard_includes = true;
+          };
+        };
     matches = {
 		base = {
           matches = [
