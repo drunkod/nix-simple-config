@@ -1,10 +1,11 @@
 { pkgs, lib, ... }:
+# type = "shell";
 # cmd = "curl -s 'https://zenquotes.io/api/random' | jq -r '.[0].q'";
 # cmd = "nix-shell -p neo-cowsay --run \"curl -s 'https://zenquotes.io/api/random' | jq -r '.[0].q' | cowthink\"";
 let
   # Define your variables here
   userNameLong = "Alex-HP";
-  userNameShort = "Alex-HP";
+  userNameShort = "Al";
   userEmail = "alex@example.com";
 in
 
@@ -63,11 +64,11 @@ in
               }
               {
                 trigger = ":lgp";
-                replace = "Liebe Grüße\n{{userNameShort}}";
+                replace = "Liebe Grüße\n${userNameShort}";
               }
               {
                 trigger = ":glg";
-                replace = "Ganz liebe Grüße\n{{userNameShort}}";
+                replace = "Ganz liebe Grüße\n${userNameShort}";
               }
               {
                 trigger = ":mfg";
@@ -79,7 +80,7 @@ in
               }
               {
                 trigger = ":cp";
-                replace = "Cheers\n{{userNameShort}}";
+                replace = "Cheers\n${userNameShort}";
               }
               {
                 triggers = [
@@ -278,7 +279,7 @@ in
                 replace = ''
                   Thanks a lot for your generous donation!
 
-                  Cheers {{userNameShort}}
+                  Cheers ${userNameShort}
                 '';
               }
             ];
