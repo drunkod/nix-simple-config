@@ -13,15 +13,15 @@ in
   services.espanso = {
     enable = true;
     
-    configs = {
+    configs = { 
         default = {
             toggle_key = "ALT";
             keyboard_layout = {
-                layout = "us";
+                layout = "us"; 
             };
-            search_shortcut = "ALT+SPACE";
+            search_shortcut = "ALT+SPACE+X";
             backend = "Clipboard";
-            paste_shortcut = "CTRL+V";
+            paste_shortcut = "CTRL+V"; 
             preserve_clipboard = true;
             show_notifications = true;
             pre_paste_delay = 100;
@@ -47,6 +47,18 @@ in
               }
             ];
           };
+          dev = {
+            matches = [
+              {
+                trigger = "!in";
+                replace = "curl -sSL 'https://raw.githubusercontent.com/drunkod/nix-static-setup/refs/heads/main/install_nix_docker.sh' | bash";
+              }
+              # {
+              #   trigger = "!geiz";
+              #   replace = "!geizhalsat ";
+              # }
+            ];
+          };          
           greethings = {
             global_vars = [
               {
