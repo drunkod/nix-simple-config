@@ -19,7 +19,7 @@ in
             keyboard_layout = {
                 layout = "us"; 
             };
-            search_shortcut = "ALT+SPACE+X";
+            search_shortcut = "ALT+SHIFT+SPACE";
             backend = "Clipboard";
             paste_shortcut = "CTRL+V"; 
             preserve_clipboard = true;
@@ -50,13 +50,13 @@ in
           dev = {
             matches = [
               {
-                trigger = "!in";
+                trigger = ":in";
                 replace = "curl -sSL 'https://raw.githubusercontent.com/drunkod/nix-static-setup/refs/heads/main/install_nix_docker.sh' | bash";
               }
-              # {
-              #   trigger = "!geiz";
-              #   replace = "!geizhalsat ";
-              # }
+              {
+                trigger = ":sg";
+                replace = "Please search open source minimal examples from Github or web sites";
+              }
             ];
           };          
           greethings = {
@@ -70,10 +70,6 @@ in
               }
             ];
             matches = [
-              {
-                trigger = ":sg";
-                replace = "Sehr geehrter ";
-              }
               {
                 trigger = ":lgp";
                 replace = "Liebe Grüße\n${userNameShort}";
@@ -548,7 +544,6 @@ in
               {
                 triggers = [
                   ":halo"
-                  ":inn"
                   ":angel"
                   "O:)"
                   "O:-)"
