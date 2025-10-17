@@ -103,6 +103,8 @@
   # System packages
   nixpkgs.config.allowUnfree = true;
   environment.systemPackages = with pkgs; [
+    os-prober
+    ntfs3g    
     git
     zen-browser.packages.${pkgs.system}.default
   ];
