@@ -91,11 +91,13 @@
   # Virtualization
   virtualisation.docker.enable = false;
 
+  programs.adb.enable = true;
+
   # User account
   users.users.alex = {
     isNormalUser = true;
     description = "Alex-HP";
-    extraGroups = [ "networkmanager" "wheel" ];
+    extraGroups = [ "networkmanager" "wheel" "adbusers" ];
   };
 
   # System packages
