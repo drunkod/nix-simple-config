@@ -30,6 +30,10 @@
     audio-recorder
     xarchiver
     libnotify
+
+    sing-box
+    crow-translate
+
   ];
 
   # Programs
