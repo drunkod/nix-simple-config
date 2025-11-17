@@ -43,20 +43,34 @@
     LC_TIME = "ru_RU.UTF-8";
   };
 
-  # XDG Desktop Portal - NEEDED FOR VALENT REMOTE INPUT
+   # XDG Desktop Portal - Explicitly map RemoteDesktop to GNOME backend
   xdg.portal = {
     enable = true;
     extraPortals = with pkgs; [
-      xdg-desktop-portal-gnome  # Changed from -gtk, provides RemoteDesktop
-      xdg-desktop-portal-gtk    # Keep this for other GTK portal features
+      xdg-desktop-portal-gnome  # Provides RemoteDesktop interface
+      xdg-desktop-portal-gtk    # For GTK file chooser, etc.
     ];
-    config.common.default = [ "gnome" "gtk" ];
+    config = {
+      common = {
+        default = [ "gtk" ];  # GTK as default for most things
+        "org.freedesktop.impl.portal.RemoteDesktop" = [ "gnome" ];  # GNOME for RemoteDesktop
+        "org.freedesktop.impl.portal.ScreenCast" = [ "gnome" ];     # GNOME for ScreenCast
+      };
+    };
   };
-  
+
+  # Add GNOME services needed for portals
+  services.dbus.packages = with pkgs; [ 
+    gnome-settings-daemon  # Needed by gnome portal
+  ];
+
   # Services
   services = {
     udisks2.enable = true;
     fwupd.enable = true;
+    
+    # GNOME services for portal support
+    gnome.gnome-keyring.enable = true;
     
     # X11 and Desktop
     xserver = {
@@ -82,7 +96,6 @@
     };
     system-config-printer.enable = true;
     
-    
     pulseaudio.enable = false;
     
     pipewire = {
@@ -99,6 +112,7 @@
     enable = true;
     package = pkgs-valent.valent; 
   };
+
   # Audio
   security.rtkit.enable = true;
 
@@ -117,11 +131,10 @@
   # System packages
   nixpkgs.config.allowUnfree = true;
   environment.systemPackages = with pkgs; [
-    # os-prober
-    # ntfs3g    
     git
     zen-browser.packages.${pkgs.system}.default
   ];
+
 
   system.stateVersion = "25.05";
 }
