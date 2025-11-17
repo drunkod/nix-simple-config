@@ -43,12 +43,14 @@
     LC_TIME = "ru_RU.UTF-8";
   };
 
+  # XDG Desktop Portal - NEEDED FOR VALENT REMOTE INPUT
   xdg.portal = {
     enable = true;
     extraPortals = with pkgs; [
-      xdg-desktop-portal-gtk
+      xdg-desktop-portal-gnome  # Changed from -gtk, provides RemoteDesktop
+      xdg-desktop-portal-gtk    # Keep this for other GTK portal features
     ];
-    config.common.default = "*";
+    config.common.default = [ "gnome" "gtk" ];
   };
   
   # Services
