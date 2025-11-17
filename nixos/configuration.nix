@@ -43,6 +43,14 @@
     LC_TIME = "ru_RU.UTF-8";
   };
 
+  xdg.portal = {
+    enable = true;
+    extraPortals = with pkgs; [
+      xdg-desktop-portal-gtk
+    ];
+    config.common.default = "*";
+  };
+  
   # Services
   services = {
     udisks2.enable = true;
