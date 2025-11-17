@@ -1,4 +1,4 @@
-{ config, pkgs, lib, zen-browser, ... }:
+{ config, pkgs, lib, zen-browser, pkgs-valent, ... }:
 
 {
   imports = [ ./hardware-configuration.nix ];
@@ -87,7 +87,7 @@
   
   programs.kdeconnect = {
     enable = true;
-    package = pkgs.valent;
+    package = pkgs-valent.valent; 
   };
   # Audio
   security.rtkit.enable = true;
