@@ -134,7 +134,10 @@
     git
     zen-browser.packages.${pkgs.system}.default
   ];
-
+  # Set environment variables for portal
+  environment.sessionVariables = {
+    XDG_CURRENT_DESKTOP = "Budgie:GNOME";  # Tell portals we're GNOME-compatible
+  };
 
   system.stateVersion = "25.05";
 }
