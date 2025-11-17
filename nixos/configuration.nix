@@ -85,6 +85,10 @@
 
   programs.system-config-printer.enable = true;
   
+  programs.kdeconnect = {
+    enable = true;
+    package = pkgs.valent;
+  };
   # Audio
   security.rtkit.enable = true;
 
