@@ -3,6 +3,7 @@
 {
   imports = [
     ./modules/espanso.nix
+    ./modules/proxy.nix
   ];
 
   # Basic configuration
@@ -19,7 +20,7 @@
     vscode
     windsurf
     antigravity
-    
+
     # Browsers
     google-chrome
     microsoft-edge
