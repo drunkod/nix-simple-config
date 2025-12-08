@@ -17,7 +17,8 @@
     # Development
     fabric-ai
     vscode
-    #windsurf
+    windsurf
+    antigravity
     
     # Browsers
     google-chrome

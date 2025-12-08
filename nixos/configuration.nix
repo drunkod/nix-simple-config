@@ -133,7 +133,6 @@
   environment.systemPackages = with pkgs; [
     git
     zen-browser.packages.${pkgs.system}.default
-    antigravity
   ];
   # Set environment variables for portal
   environment.sessionVariables = {
