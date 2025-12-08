@@ -85,7 +85,7 @@ let
   '';
 
 in {
-  # Utility scripts
+  # Utility scripts and wrapped applications
   home.packages = [
     showProxy
     setProxyScript
@@ -98,39 +98,13 @@ in {
     (wrapWithProxy pkgs.antigravity "antigravity")
   ];
 
-  # VS Code proxy settings (FIXED: use profiles.default)
-  programs.vscode = {
-    enable = true;
-    profiles.default.userSettings = {
-      # Note: VS Code settings are static, use code-proxy wrapper for dynamic IP
-      "http.proxyStrictSSL" = false;
-      "http.proxySupport" = "on";
-      # Dynamic proxy handled by wrapper script or manual setting
-    };
-  };
-
-  # Git proxy (FIXED: use settings instead of extraConfig)
-  programs.git = {
-    enable = true;
-    # For dynamic proxy, use git config command or wrapper
-    # Static config example:
-    # settings = {
-    #   http.proxy = "http://127.0.0.1:7890";
-    #   https.proxy = "http://127.0.0.1:7890";
-    # };
-  };
-
-  # Shell aliases for convenience
-  programs.bash.shellAliases = {
-    pon = "eval $(proxy-on)";
-    poff = "eval $(proxy-off)";
-    pinfo = "proxy-info";
-  };
-
-  # Also for zsh if you use it
-  programs.zsh.shellAliases = {
-    pon = "eval $(proxy-on)";
-    poff = "eval $(proxy-off)";
-    pinfo = "proxy-info";
-  };
+  # NO vscode settings - user manages their own settings.json
+  # NO git settings - user manages their own .gitconfig
+  
+  # Shell aliases for convenience (optional)
+  programs.bash.initExtra = ''
+    alias pon='eval $(proxy-on)'
+    alias poff='eval $(proxy-off)'
+    alias pinfo='proxy-info'
+  '';
 }
