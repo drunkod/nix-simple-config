@@ -8,27 +8,17 @@ let
   socksPort = "7891";
   noProxy = "localhost,127.0.0.1,::1,.local,10.0.0.0/8,172.16.0.0/12,192.168.0.0/16";
 
-  # Script to get the default route IP address
+  # Script to get the DEFAULT GATEWAY IP (not local IP)
   getProxyIP = pkgs.writeShellScript "get-proxy-ip" ''
-    # Method 1: Get IP from default route interface
-    DEFAULT_IF=$(${pkgs.iproute2}/bin/ip route | ${pkgs.gawk}/bin/awk '/default/ {print $5; exit}')
-    if [ -n "$DEFAULT_IF" ]; then
-      IP=$(${pkgs.iproute2}/bin/ip -4 addr show "$DEFAULT_IF" | ${pkgs.gawk}/bin/awk '/inet / {print $2}' | ${pkgs.coreutils}/bin/cut -d/ -f1 | ${pkgs.coreutils}/bin/head -1)
-      if [ -n "$IP" ]; then
-        echo "$IP"
-        exit 0
-      fi
-    fi
+    # Get gateway IP from default route: "default via X.X.X.X dev ..."
+    GATEWAY=$(${pkgs.iproute2}/bin/ip route | ${pkgs.gawk}/bin/awk '/^default/ {print $3; exit}')
     
-    # Method 2: Fallback - get first non-loopback IP
-    IP=$(${pkgs.hostname}/bin/hostname -I | ${pkgs.gawk}/bin/awk '{print $1}')
-    if [ -n "$IP" ]; then
-      echo "$IP"
-      exit 0
+    if [ -n "$GATEWAY" ]; then
+      echo "$GATEWAY"
+    else
+      # Fallback to localhost if no default route
+      echo "127.0.0.1"
     fi
-    
-    # Method 3: Last resort - localhost
-    echo "127.0.0.1"
   '';
 
   # Helper to wrap any package with dynamic proxy
@@ -52,7 +42,7 @@ let
     echo "════════════════════════════════════════"
     echo "  🌐 Proxy Configuration"
     echo "════════════════════════════════════════"
-    echo "  Detected IP:  $PROXY_IP"
+    echo "  Gateway IP:   $PROXY_IP"
     echo "  HTTP Proxy:   http://$PROXY_IP:${proxyPort}"
     echo "  SOCKS Proxy:  socks5://$PROXY_IP:${socksPort}"
     echo "  No Proxy:     ${noProxy}"
@@ -64,7 +54,7 @@ let
     echo "  ALL_PROXY=$ALL_PROXY"
   '';
 
-  # Script to set proxy in current shell (source this)
+  # Script to set proxy in current shell
   setProxyScript = pkgs.writeShellScriptBin "proxy-on" ''
     PROXY_IP=$(${getProxyIP})
     echo "export HTTP_PROXY=\"http://$PROXY_IP:${proxyPort}\""
@@ -98,10 +88,7 @@ in {
     (wrapWithProxy pkgs.antigravity "antigravity")
   ];
 
-  # NO vscode settings - user manages their own settings.json
-  # NO git settings - user manages their own .gitconfig
-  
-  # Shell aliases for convenience (optional)
+  # Shell aliases
   programs.bash.initExtra = ''
     alias pon='eval $(proxy-on)'
     alias poff='eval $(proxy-off)'
