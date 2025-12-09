@@ -58,6 +58,13 @@
       };
     };
   };
+
+    # CRITICAL: Enable the portal services properly
+  systemd.user.services.xdg-desktop-portal = {
+    wantedBy = [ "graphical-session.target" ];
+    wants = [ "xdg-desktop-portal-gnome.service" ];
+  };
+
   # ADD THIS: Force GNOME portal to start with graphical session
   systemd.user.services.xdg-desktop-portal-gnome = {
     description = "Portal service (GNOME implementation)";
@@ -75,7 +82,12 @@
       XDG_CURRENT_DESKTOP = "Budgie:GNOME";
     };
   };
-  
+
+  # Ensure graphical-session.target is reached for Budgie
+  systemd.user.targets.graphical-session = {
+    wantedBy = [ "default.target" ];
+  };
+
   # Add GNOME services needed for portals
   services.dbus.packages = with pkgs; [ 
     gnome-settings-daemon  # Needed by gnome portal
