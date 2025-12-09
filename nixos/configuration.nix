@@ -64,23 +64,8 @@
     wantedBy = [ "graphical-session.target" ];
     wants = [ "xdg-desktop-portal-gnome.service" ];
   };
-
-  # ADD THIS: Force GNOME portal to start with graphical session
   systemd.user.services.xdg-desktop-portal-gnome = {
-    description = "Portal service (GNOME implementation)";
-    wantedBy = [ "graphical-session.target" ];
-    partOf = [ "graphical-session.target" ];
-    after = [ "graphical-session.target" ];
-    serviceConfig = {
-      Type = "dbus";
-      BusName = "org.freedesktop.impl.portal.desktop.gnome";
-      ExecStart = "${pkgs.xdg-desktop-portal-gnome}/libexec/xdg-desktop-portal-gnome";
-      Restart = "on-failure";
-      RestartSec = 5;
-    };
-    environment = {
-      XDG_CURRENT_DESKTOP = "Budgie:GNOME";
-    };
+    wantedBy = [ "xdg-desktop-portal.service" ];
   };
 
   # Ensure graphical-session.target is reached for Budgie
