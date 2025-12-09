@@ -43,50 +43,44 @@
     LC_TIME = "ru_RU.UTF-8";
   };
 
-   # XDG Desktop Portal - Explicitly map RemoteDesktop to GNOME backend
+  # XDG Desktop Portal
   xdg.portal = {
     enable = true;
     extraPortals = with pkgs; [
-      xdg-desktop-portal-gnome  # Provides RemoteDesktop interface
-      xdg-desktop-portal-gtk    # For GTK file chooser, etc.
+      xdg-desktop-portal-gnome
+      xdg-desktop-portal-gtk
     ];
     config = {
       common = {
-        default = [ "gtk" ];  # GTK as default for most things
-        "org.freedesktop.impl.portal.RemoteDesktop" = [ "gnome" ];  # GNOME for RemoteDesktop
-        "org.freedesktop.impl.portal.ScreenCast" = [ "gnome" ];     # GNOME for ScreenCast
+        default = [ "gnome" "gtk" ];
+        "org.freedesktop.impl.portal.RemoteDesktop" = [ "gnome" ];
+        "org.freedesktop.impl.portal.ScreenCast" = [ "gnome" ];
       };
     };
   };
 
-    # CRITICAL: Enable the portal services properly
-  systemd.user.services.xdg-desktop-portal = {
-    wantedBy = [ "graphical-session.target" ];
-    wants = [ "xdg-desktop-portal-gnome.service" ];
-  };
-  systemd.user.services.xdg-desktop-portal-gnome = {
-    wantedBy = [ "xdg-desktop-portal.service" ];
-  };
-
-  # Ensure graphical-session.target is reached for Budgie
-  systemd.user.targets.graphical-session = {
-    wantedBy = [ "default.target" ];
-  };
+  # Autostart GNOME portal for Budgie (workaround for D-Bus activation issues)
+  environment.etc."xdg/autostart/xdg-desktop-portal-gnome.desktop".text = ''
+    [Desktop Entry]
+    Type=Application
+    Name=Portal service (GNOME)
+    Exec=${pkgs.xdg-desktop-portal-gnome}/libexec/xdg-desktop-portal-gnome
+    OnlyShowIn=Budgie;GNOME;
+    X-GNOME-Autostart-Phase=WindowManager
+    X-GNOME-AutoRestart=true
+  '';
 
   # Add GNOME services needed for portals
   services.dbus.packages = with pkgs; [ 
-    gnome-settings-daemon  # Needed by gnome portal
+    gnome-settings-daemon
   ];
 
   # Services
   services = {
     udisks2.enable = true;
     fwupd.enable = true;
-    
-    # GNOME services for portal support
     gnome.gnome-keyring.enable = true;
     
-    # X11 and Desktop
     xserver = {
       enable = true;
       desktopManager.budgie.enable = true;
@@ -97,13 +91,11 @@
       };
     };
     
-    # Auto login
     displayManager.autoLogin = {
       enable = true;
       user = "alex";
     };
     
-    # Printing
     printing = {
       enable = true;
       drivers = with pkgs; [ hplip hplipWithPlugin ];
@@ -127,30 +119,24 @@
     package = pkgs-valent.valent; 
   };
 
-  # Audio
   security.rtkit.enable = true;
-
-  # Virtualization
   virtualisation.docker.enable = false;
-
   programs.adb.enable = true;
 
-  # User account
   users.users.alex = {
     isNormalUser = true;
     description = "Alex-HP";
     extraGroups = [ "networkmanager" "wheel" "adbusers" ];
   };
 
-  # System packages
   nixpkgs.config.allowUnfree = true;
   environment.systemPackages = with pkgs; [
     git
     zen-browser.packages.${pkgs.system}.default
   ];
-  # Set environment variables for portal
+
   environment.sessionVariables = {
-    XDG_CURRENT_DESKTOP = "Budgie:GNOME";  # Tell portals we're GNOME-compatible
+    XDG_CURRENT_DESKTOP = "Budgie:GNOME";
   };
 
   system.stateVersion = "25.05";
