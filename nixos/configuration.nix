@@ -58,7 +58,24 @@
       };
     };
   };
-
+  # ADD THIS: Force GNOME portal to start with graphical session
+  systemd.user.services.xdg-desktop-portal-gnome = {
+    description = "Portal service (GNOME implementation)";
+    wantedBy = [ "graphical-session.target" ];
+    partOf = [ "graphical-session.target" ];
+    after = [ "graphical-session.target" ];
+    serviceConfig = {
+      Type = "dbus";
+      BusName = "org.freedesktop.impl.portal.desktop.gnome";
+      ExecStart = "${pkgs.xdg-desktop-portal-gnome}/libexec/xdg-desktop-portal-gnome";
+      Restart = "on-failure";
+      RestartSec = 5;
+    };
+    environment = {
+      XDG_CURRENT_DESKTOP = "Budgie:GNOME";
+    };
+  };
+  
   # Add GNOME services needed for portals
   services.dbus.packages = with pkgs; [ 
     gnome-settings-daemon  # Needed by gnome portal
