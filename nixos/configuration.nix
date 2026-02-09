@@ -1,65 +1,88 @@
 { config, pkgs, lib, zen-browser, pkgs-valent, ... }:
 
+let
+  ruLocale = "ru_RU.UTF-8";
+  ruLocaleCategories = [
+    "LC_ADDRESS"
+    "LC_IDENTIFICATION"
+    "LC_MEASUREMENT"
+    "LC_MONETARY"
+    "LC_NAME"
+    "LC_NUMERIC"
+    "LC_PAPER"
+    "LC_TELEPHONE"
+    "LC_TIME"
+  ];
+in
 {
   imports = [ ./hardware-configuration.nix ];
 
-  # Nix settings
+  # ── Nix ──────────────────────────────────────────────
   nix.settings.experimental-features = [ "nix-command" "flakes" ];
+  nixpkgs.config.allowUnfree = true;
 
-  # Bootloader
-  boot.loader.grub = {
-    enable = true;
-    device = "/dev/sda";
-    useOSProber = true;
+  # ── Boot ─────────────────────────────────────────────
+  boot = {
+    loader.grub = {
+      enable = true;
+      device = "/dev/sda";
+      useOSProber = true;
+    };
+    supportedFilesystems = [ "ntfs" ];
+    kernelModules = [ "mmc_block" ];
+    kernel.sysctl = {
+      "net.ipv4.ip_default_ttl" = 65;
+      "net.ipv6.conf.all.hop_limit" = 65;
+      "net.ipv6.conf.default.hop_limit" = 65;
+    };
   };
-  boot.supportedFilesystems = [ "ntfs" ];
-  boot.kernelModules = [ "mmc_block" ];
 
-  # Network settings
-  boot.kernel.sysctl = {
-    "net.ipv4.ip_default_ttl" = 65;
-    "net.ipv6.conf.all.hop_limit" = 65;
-    "net.ipv6.conf.default.hop_limit" = 65;
-  };
-
-  # Networking
+  # ── Networking ───────────────────────────────────────
   networking = {
     hostName = "HP";
     networkmanager.enable = true;
   };
 
-  # Localization
+  # ── Localization ─────────────────────────────────────
   time.timeZone = "Asia/Yekaterinburg";
-  i18n.defaultLocale = "en_US.UTF-8";
-  i18n.extraLocaleSettings = {
-    LC_ADDRESS = "ru_RU.UTF-8";
-    LC_IDENTIFICATION = "ru_RU.UTF-8";
-    LC_MEASUREMENT = "ru_RU.UTF-8";
-    LC_MONETARY = "ru_RU.UTF-8";
-    LC_NAME = "ru_RU.UTF-8";
-    LC_NUMERIC = "ru_RU.UTF-8";
-    LC_PAPER = "ru_RU.UTF-8";
-    LC_TELEPHONE = "ru_RU.UTF-8";
-    LC_TIME = "ru_RU.UTF-8";
+  i18n = {
+    defaultLocale = "en_US.UTF-8";
+    extraLocaleSettings = builtins.listToAttrs (map (cat: {
+      name = cat;
+      value = ruLocale;
+    }) ruLocaleCategories);
   };
 
-  # XDG Desktop Portal
+  # ── Desktop & Display ───────────────────────────────
+  services.xserver = {
+    enable = true;
+    displayManager.lightdm.enable = true;
+    xkb = { layout = "us"; variant = ""; };
+  };
+  services.desktopManager.budgie.enable = true;
+
+  services.displayManager.autoLogin = {
+    enable = true;
+    user = "alex";
+  };
+
+  environment.sessionVariables.XDG_CURRENT_DESKTOP = "Budgie:GNOME";
+
+  # ── XDG Portals ─────────────────────────────────────
   xdg.portal = {
     enable = true;
     extraPortals = with pkgs; [
       xdg-desktop-portal-gnome
       xdg-desktop-portal-gtk
     ];
-    config = {
-      common = {
-        default = [ "gnome" "gtk" ];
-        "org.freedesktop.impl.portal.RemoteDesktop" = [ "gnome" ];
-        "org.freedesktop.impl.portal.ScreenCast" = [ "gnome" ];
-      };
+    config.common = {
+      default = [ "gnome" "gtk" ];
+      "org.freedesktop.impl.portal.RemoteDesktop" = [ "gnome" ];
+      "org.freedesktop.impl.portal.ScreenCast" = [ "gnome" ];
     };
   };
 
-  # Autostart GNOME portal for Budgie (workaround for D-Bus activation issues)
+  # Autostart GNOME portal for Budgie (D-Bus activation workaround)
   environment.etc."xdg/autostart/xdg-desktop-portal-gnome.desktop".text = ''
     [Desktop Entry]
     Type=Application
@@ -70,74 +93,49 @@
     X-GNOME-AutoRestart=true
   '';
 
-  # Add GNOME services needed for portals
-  services.dbus.packages = with pkgs; [ 
-    gnome-settings-daemon
-  ];
+  services.dbus.packages = [ pkgs.gnome-settings-daemon ];
 
-  # Services
-  services = {
-    udisks2.enable = true;
-    fwupd.enable = true;
-    gnome.gnome-keyring.enable = true;
-    
-    xserver = {
-      enable = true;
-      desktopManager.budgie.enable = true;
-      displayManager.lightdm.enable = true;
-      xkb = {
-        layout = "us";
-        variant = "";
-      };
-    };
-    
-    displayManager.autoLogin = {
-      enable = true;
-      user = "alex";
-    };
-    
-    printing = {
-      enable = true;
-      drivers = with pkgs; [ hplip hplipWithPlugin ];
-    };
-    system-config-printer.enable = true;
-    
-    pulseaudio.enable = false;
-    
-    pipewire = {
-      enable = true;
-      alsa.enable = true;
-      alsa.support32Bit = true;
-      pulse.enable = true;
-    };
+  # ── Audio ────────────────────────────────────────────
+  services.pulseaudio.enable = false;
+  security.rtkit.enable = true;
+  services.pipewire = {
+    enable = true;
+    alsa = { enable = true; support32Bit = true; };
+    pulse.enable = true;
   };
 
+  # ── Printing ─────────────────────────────────────────
+  services.printing = {
+    enable = true;
+    drivers = with pkgs; [ hplip hplipWithPlugin ];
+  };
+  services.system-config-printer.enable = true;
   programs.system-config-printer.enable = true;
-  
+
+  # ── Other Services ──────────────────────────────────
+  services.udisks2.enable = true;
+  services.fwupd.enable = true;
+  services.gnome.gnome-keyring.enable = true;
+
+  # ── Programs ─────────────────────────────────────────
   programs.kdeconnect = {
     enable = true;
-    package = pkgs-valent.valent; 
+    package = pkgs-valent.valent;
   };
 
-  security.rtkit.enable = true;
-  virtualisation.docker.enable = false;
-
+  # ── Users ────────────────────────────────────────────
   users.users.alex = {
     isNormalUser = true;
     description = "Alex-HP";
     extraGroups = [ "networkmanager" "wheel" "adbusers" ];
   };
 
-  nixpkgs.config.allowUnfree = true;
-  environment.systemPackages = with pkgs; [
-    git
+  # ── System Packages ─────────────────────────────────
+  environment.systemPackages = [
+    pkgs.git
+    pkgs.android-tools
     zen-browser.packages.${pkgs.system}.default
-    android-tools
   ];
-
-  environment.sessionVariables = {
-    XDG_CURRENT_DESKTOP = "Budgie:GNOME";
-  };
 
   system.stateVersion = "25.05";
 }
