@@ -29,7 +29,6 @@
     usbutils
     pciutils
     scrcpy
-    audio-recorder
     xarchiver
     libnotify
 
