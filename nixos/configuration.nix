@@ -121,7 +121,6 @@
 
   security.rtkit.enable = true;
   virtualisation.docker.enable = false;
-  programs.adb.enable = true;
 
   users.users.alex = {
     isNormalUser = true;
@@ -133,6 +132,7 @@
   environment.systemPackages = with pkgs; [
     git
     zen-browser.packages.${pkgs.system}.default
+    android-tools
   ];
 
   environment.sessionVariables = {
