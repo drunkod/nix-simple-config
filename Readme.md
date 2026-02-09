@@ -424,6 +424,30 @@ nix flake update
 sudo nixos-rebuild switch --flake .#hp
 ```
 
+### Update VS Code (Flake + Home Manager/NixOS)
+
+If `code --version` stays old after `nix flake update`, you probably have an old
+imperative profile package shadowing the declarative one.
+
+```bash
+cd ~/nixos-config
+
+# Recommended modern syntax (equivalent to lock --update-input)
+nix flake update nixpkgs home-manager
+
+# Apply flake changes
+sudo nixos-rebuild switch --flake .#hp
+
+# If VS Code is still old, remove imperative profile package
+nix profile remove vscode
+exec bash -l
+
+# Verify active binary/version
+which code
+readlink -f "$(which code)"
+code --version
+```
+
 ### Automatic Updates (Optional)
 
 Add to `nixos/configuration.nix`:
