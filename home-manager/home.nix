@@ -25,7 +25,7 @@
     google-chrome
     microsoft-edge
     
-    # Utilities
+    # Utilities testings
     usbutils
     pciutils
     scrcpy

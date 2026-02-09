@@ -58,6 +58,22 @@
         "type": "github"
       }
     },
+    "nixpkgs-budgie": {
+      "locked": {
+        "lastModified": 1770464364,
+        "narHash": "sha256-z5NJPSBwsLf/OfD8WTmh79tlSU8XgIbwmk6qB1/TFzY=",
+        "owner": "nixos",
+        "repo": "nixpkgs",
+        "rev": "23d72dabcb3b12469f57b37170fcbc1789bd7457",
+        "type": "github"
+      },
+      "original": {
+        "owner": "nixos",
+        "ref": "nixos-25.11",
+        "repo": "nixpkgs",
+        "type": "github"
+      }
+    },
     "nixpkgs-valent": {
       "locked": {
         "lastModified": 1763266893,
@@ -94,6 +110,7 @@
       "inputs": {
         "home-manager": "home-manager",
         "nixpkgs": "nixpkgs",
+        "nixpkgs-budgie": "nixpkgs-budgie",
         "nixpkgs-valent": "nixpkgs-valent",
         "zen-browser": "zen-browser"
       }
