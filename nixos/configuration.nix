@@ -71,23 +71,38 @@ in
   # ── XDG Portals ─────────────────────────────────────
   xdg.portal = {
     enable = true;
-    extraPortals = with pkgs; [ xdg-desktop-portal-gtk ];
+    extraPortals = with pkgs; [
+      xdg-desktop-portal-gtk
+      xdg-desktop-portal-gnome
+    ];
     config.common = {
       default = [ "gtk" ];
     };
     # Budgie sessions often expose XDG_CURRENT_DESKTOP=Budgie:GNOME.
-    # Force both IDs to resolve to GTK backend so GNOME portal isn't required.
-    config.budgie.default = [ "gtk" ];
-    config.gnome.default = [ "gtk" ];
+    # Keep GTK default, route only RemoteDesktop/ScreenCast to GNOME backend.
+    config.budgie = {
+      default = [ "gtk" ];
+      "org.freedesktop.impl.portal.RemoteDesktop" = [ "gnome" ];
+      "org.freedesktop.impl.portal.ScreenCast" = [ "gnome" ];
+    };
+    config.gnome = {
+      default = [ "gtk" ];
+      "org.freedesktop.impl.portal.RemoteDesktop" = [ "gnome" ];
+      "org.freedesktop.impl.portal.ScreenCast" = [ "gnome" ];
+    };
   };
+
+  # Keep graphical-session.target active in Budgie sessions so DBus can start
+  # xdg-desktop-portal-gnome.service without dependency timeouts.
+  systemd.user.targets.graphical-session.wantedBy = [ "default.target" ];
 
   # Disable broken Budgie autostart entry with missing executable.
   environment.etc."xdg/autostart/org.buddiesofbudgie.SettingsDaemon.DiskUtilityNotify.desktop".text = lib.mkForce ''
     [Desktop Entry]
+    Type=Application
+    Name=Disable broken Budgie DiskUtilityNotify autostart
     Hidden=true
   '';
-
-  services.dbus.packages = [ pkgs.gnome-settings-daemon ];
 
   # ── Audio ────────────────────────────────────────────
   services.pulseaudio.enable = false;
