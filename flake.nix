@@ -2,7 +2,7 @@
   inputs = {
     nixpkgs.url = "github:nixos/nixpkgs/nixos-unstable";
     nixpkgs-budgie.url = "github:nixos/nixpkgs/nixos-25.11";
-    nixpkgs-valent.url = "github:nixos/nixpkgs/9ba0962c381ef85795172bd01ee57de1a84834ee";
+    nixpkgs-valent.url = "github:nixos/nixpkgs/d6c71932130818840fc8fe9509cf50be8c64634f";
 
     home-manager = {
       url = "github:nix-community/home-manager/master";

@@ -71,26 +71,20 @@ in
   # ── XDG Portals ─────────────────────────────────────
   xdg.portal = {
     enable = true;
-    extraPortals = with pkgs; [
-      xdg-desktop-portal-gnome
-      xdg-desktop-portal-gtk
-    ];
+    extraPortals = with pkgs; [ xdg-desktop-portal-gtk ];
     config.common = {
-      default = [ "gnome" "gtk" ];
-      "org.freedesktop.impl.portal.RemoteDesktop" = [ "gnome" ];
-      "org.freedesktop.impl.portal.ScreenCast" = [ "gnome" ];
+      default = [ "gtk" ];
     };
+    # Budgie sessions often expose XDG_CURRENT_DESKTOP=Budgie:GNOME.
+    # Force both IDs to resolve to GTK backend so GNOME portal isn't required.
+    config.budgie.default = [ "gtk" ];
+    config.gnome.default = [ "gtk" ];
   };
 
-  # Autostart GNOME portal for Budgie (D-Bus activation workaround)
-  environment.etc."xdg/autostart/xdg-desktop-portal-gnome.desktop".text = ''
+  # Disable broken Budgie autostart entry with missing executable.
+  environment.etc."xdg/autostart/org.buddiesofbudgie.SettingsDaemon.DiskUtilityNotify.desktop".text = lib.mkForce ''
     [Desktop Entry]
-    Type=Application
-    Name=Portal service (GNOME)
-    Exec=${pkgs.xdg-desktop-portal-gnome}/libexec/xdg-desktop-portal-gnome
-    OnlyShowIn=Budgie;GNOME;
-    X-GNOME-Autostart-Phase=WindowManager
-    X-GNOME-AutoRestart=true
+    Hidden=true
   '';
 
   services.dbus.packages = [ pkgs.gnome-settings-daemon ];
