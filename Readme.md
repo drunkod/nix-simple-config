@@ -658,11 +658,22 @@ systemctl --user status home-manager-alex.service
 ### Out of Disk Space
 
 ```bash
-# Clean old generations
+# Check free space
+df -h /
+du -sh /nix/store
+
+# Run Nix garbage collection to remove unreferenced store paths
+nix-collect-garbage -d
+nix store gc
+
+# System-wide cleanup (recommended on NixOS)
 sudo nix-collect-garbage -d
 
 # Remove old boot entries
 sudo /run/current-system/bin/switch-to-configuration boot
+
+# Check free space again
+df -h /
 ```
 
 ### Rollback System

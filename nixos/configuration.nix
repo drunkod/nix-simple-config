@@ -28,7 +28,7 @@ in
       device = "/dev/sda";
       useOSProber = true;
     };
-    supportedFilesystems = [ "ntfs" ];
+    supportedFilesystems = [ "ntfs" "vfat" "exfat" ];
     kernelModules = [ "mmc_block" ];
     kernel.sysctl = {
       "net.ipv4.ip_default_ttl" = 65;
