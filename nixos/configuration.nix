@@ -17,6 +17,23 @@ in
 {
   imports = [ ./hardware-configuration.nix ];
 
+  # ── Extra Mounts ────────────────────────────────────
+  fileSystems."/mnt/sda2" = {
+    device = "/dev/disk/by-uuid/8FD5-9B47";
+    fsType = "vfat";
+    options = [
+      "uid=1000"
+      "gid=100"
+      "utf8=1"
+      "shortname=mixed"
+      "fmask=0022"
+      "dmask=0022"
+      "x-mount.mkdir"
+      "nofail"
+      "x-gvfs-show"
+    ];
+  };
+
   # ── Nix ──────────────────────────────────────────────
   nix.settings.experimental-features = [ "nix-command" "flakes" ];
   nixpkgs.config.allowUnfree = true;
@@ -106,6 +123,26 @@ in
 
   # ── Audio ────────────────────────────────────────────
   services.pulseaudio.enable = false;
+  security.polkit = {
+    enable = true;
+    extraConfig = ''
+      polkit.addRule(function(action, subject) {
+        var udisksActions = [
+          "org.freedesktop.udisks2.filesystem-mount",
+          "org.freedesktop.udisks2.filesystem-mount-system",
+          "org.freedesktop.udisks2.filesystem-mount-other-seat",
+          "org.freedesktop.udisks2.filesystem-unmount-others",
+          "org.freedesktop.udisks2.encrypted-unlock",
+          "org.freedesktop.udisks2.eject-media",
+          "org.freedesktop.udisks2.power-off-drive"
+        ];
+
+        if (udisksActions.indexOf(action.id) >= 0 && subject.isInGroup("wheel")) {
+          return polkit.Result.YES;
+        }
+      });
+    '';
+  };
   security.rtkit.enable = true;
   services.pipewire = {
     enable = true;
