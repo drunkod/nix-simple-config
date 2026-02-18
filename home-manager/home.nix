@@ -20,7 +20,7 @@
 
       # Browsers
       google-chrome
-      microsoft-edge
+      #microsoft-edge
 
       # Utilities
       usbutils
