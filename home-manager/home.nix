@@ -1,4 +1,4 @@
-{ config, pkgs, ... }:
+{ config, pkgs, inputs, ... }:
 
 {
   imports = [
@@ -30,7 +30,7 @@
       libnotify
       sing-box
       crow-translate
-      codex
+      inputs.codex-cli-nix.packages.${pkgs.system}.default
     ];
   };
 

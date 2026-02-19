@@ -1,4 +1,4 @@
-{ config, pkgs, lib, ... }:
+{ config, pkgs, lib, inputs, ... }:
 
 let
   # ── Configuration ─────────────────────────────────
@@ -39,7 +39,7 @@ let
     { pkg = pkgs.windsurf;       bin = "windsurf"; }
     { pkg = pkgs.google-chrome;  bin = "google-chrome-stable"; }
     { pkg = pkgs.antigravity;    bin = "antigravity"; }
-    { pkg = pkgs.codex;          bin = "codex"; }
+    { pkg = inputs.codex-cli-nix.packages.${pkgs.system}.default; bin = "codex"; }
   ];
 
   # ── Utility scripts ──────────────────────────────
