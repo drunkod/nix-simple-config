@@ -30,6 +30,7 @@
       libnotify
       sing-box
       crow-translate
+      codex
     ];
   };
 
