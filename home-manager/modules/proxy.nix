@@ -39,6 +39,7 @@ let
     { pkg = pkgs.windsurf;       bin = "windsurf"; }
     { pkg = pkgs.google-chrome;  bin = "google-chrome-stable"; }
     { pkg = pkgs.antigravity;    bin = "antigravity"; }
+    { pkg = pkgs.codex;          bin = "codex"; }
   ];
 
   # ── Utility scripts ──────────────────────────────
