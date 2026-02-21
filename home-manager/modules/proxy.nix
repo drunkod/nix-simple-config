@@ -26,12 +26,12 @@ let
   ];
 
   # ── Wrapper for proxied applications ──────────────
-  wrapWithProxy = pkg: binName:
-    pkgs.writeShellScriptBin "${binName}-proxy" ''
+  wrapWithProxy = { pkg, bin, wrapper ? "${bin}-proxy" }:
+    pkgs.writeShellScriptBin wrapper ''
       PROXY_IP=$(${getProxyIP})
       ${proxyExports "$PROXY_IP"}
       echo "🌐 Proxy: $PROXY_IP:${proxyPort}"
-      exec ${pkg}/bin/${binName} "$@"
+      exec ${pkg}/bin/${bin} "$@"
     '';
 
   proxiedApps = [
@@ -39,7 +39,7 @@ let
     { pkg = pkgs.windsurf;       bin = "windsurf"; }
     { pkg = pkgs.google-chrome;  bin = "google-chrome-stable"; }
     { pkg = pkgs.antigravity;    bin = "antigravity"; }
-    { pkg = pkgs."claude-code";  bin = "claude"; }
+    { pkg = pkgs."claude-code";  bin = "claude"; wrapper = "claude"; }
     { pkg = inputs.codex-cli-nix.packages.${pkgs.system}.default; bin = "codex"; }
   ];
 
@@ -81,7 +81,7 @@ in
     proxyInfo
     proxyOn
     proxyOff
-  ] ++ map (app: wrapWithProxy app.pkg app.bin) proxiedApps;
+  ] ++ map wrapWithProxy proxiedApps;
 
   programs.bash.initExtra = ''
     alias pon='eval $(proxy-on)'
