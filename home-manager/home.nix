@@ -30,9 +30,9 @@
       libnotify
       sing-box
       crow-translate
-      inputs.codex-cli-nix.packages.${pkgs.system}.default
+      # inputs.codex-cli-nix.packages.${pkgs.system}.default
       ripgrep
-      claude-code
+      # claude-code
     ];
   };
 
