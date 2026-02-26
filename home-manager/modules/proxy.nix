@@ -30,6 +30,7 @@ let
     pkgs.writeShellScriptBin wrapper ''
       PROXY_IP=$(${getProxyIP})
       ${proxyExports "$PROXY_IP"}
+      export SHELL="${pkgs.bashInteractive}/bin/bash"
       echo "🌐 Proxy: $PROXY_IP:${proxyPort}"
       exec ${pkg}/bin/${bin} "$@"
     '';
