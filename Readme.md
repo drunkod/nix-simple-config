@@ -88,7 +88,7 @@ sudo nixos-rebuild switch --flake .#hp
 
 ```bash
 nix flake update
-sudo nixos-rebuild switch --flake github:drunkod/nixos-config#hp --refresh
+sudo nixos-rebuild switch --flake github:drunkod/nix-simple-config#hp --refresh
 
 ```
 
