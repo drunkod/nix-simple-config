@@ -12,6 +12,7 @@
     stateVersion = "25.05";
 
     packages = with pkgs; [
+      turbovnc
       # Development
       fabric-ai
       vscode
