@@ -17,14 +17,14 @@ Alex keeps the existing Espanso profile because `home-manager/modules/espanso.ni
 
 The repository cannot safely infer Acer disk UUIDs, boot devices, CPU modules, or swap configuration from the existing HP profile. Therefore `nixos/hosts/Acer/hardware-configuration.nix` is deliberately only a safe template.
 
-On the Acer machine, generate and copy its real hardware configuration before switching:
+On the Acer machine, replace it with the generated hardware configuration before switching:
 
 ```bash
-sudo nixos-generate-config
-cp /etc/nixos/hardware-configuration.nix ./nixos/hosts/Acer/hardware-configuration.nix
+sudo nixos-generate-config --show-hardware-config \
+  > nixos/hosts/Acer/hardware-configuration.nix
 ```
 
-Review the generated file and commit it to the Acer branch. Do not copy the HP hardware file: it contains HP-specific disk and CPU settings.
+Review the generated file and add the Acer boot-loader configuration appropriate for its UEFI or legacy BIOS setup. Do not copy the HP hardware file: it contains HP-specific disk and CPU settings.
 
 ## Build and test
 
@@ -34,7 +34,7 @@ Test the existing HP configuration:
 sudo nixos-rebuild test --flake .#hp
 ```
 
-Test the Acer configuration after replacing its hardware template:
+Test the Acer configuration after replacing its hardware template and configuring its boot loader:
 
 ```bash
 sudo nixos-rebuild test --flake .#Acer
@@ -67,8 +67,10 @@ sudo nixos-rebuild test --flake .#Acer
 
 ## Rebuild directly from GitHub
 
-After the Acer hardware file has been committed:
+After the Acer hardware file and boot-loader settings have been committed:
 
 ```bash
-sudo nixos-rebuild test --flake github:drunkod/nix-simple-config/agent/add-acer-vc#Acer --refresh
+sudo nixos-rebuild test \
+  --flake 'github:drunkod/nix-simple-config?ref=agent/add-acer-vc#Acer' \
+  --refresh
 ```
