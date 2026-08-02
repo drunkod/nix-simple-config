@@ -13,11 +13,35 @@
     zen-browser.url = "github:0xc000022070/zen-browser-flake";
   };
 
-  outputs = inputs@{ self, nixpkgs, nixpkgs-budgie, nixpkgs-valent, home-manager, zen-browser, codex-cli-nix, ... }:
+  outputs = inputs@{
+    nixpkgs,
+    nixpkgs-budgie,
+    nixpkgs-valent,
+    home-manager,
+    zen-browser,
+    codex-cli-nix,
+    ...
+  }:
     let
       system = "x86_64-linux";
-      importPkgs = input: import input { inherit system; config.allowUnfree = true; };
+      importPkgs = input: import input {
+        inherit system;
+        config.allowUnfree = true;
+      };
       pkgs = importPkgs nixpkgs;
+      specialArgs = {
+        inherit zen-browser;
+        pkgs-valent = importPkgs nixpkgs-valent;
+        pkgs-budgie = importPkgs nixpkgs-budgie;
+      };
+      homeManagerModule = users: {
+        home-manager = {
+          useGlobalPkgs = true;
+          useUserPackages = true;
+          extraSpecialArgs = { inherit inputs; };
+          inherit users;
+        };
+      };
     in
     {
       devShells.${system}.default = pkgs.mkShell {
@@ -26,26 +50,30 @@
         ];
       };
 
-      nixosConfigurations.hp = nixpkgs.lib.nixosSystem {
-        inherit system;
-        specialArgs = {
-          inherit zen-browser;
-          pkgs-valent = importPkgs nixpkgs-valent;
-          pkgs-budgie = importPkgs nixpkgs-budgie;
+      nixosConfigurations = {
+        hp = nixpkgs.lib.nixosSystem {
+          inherit system specialArgs;
+          modules = [
+            ./nixos/configuration.nix
+            ./nixos/budgie-overlay.nix
+            home-manager.nixosModules.home-manager
+            (homeManagerModule {
+              alex = import ./home-manager/home.nix;
+            })
+          ];
         };
-        modules = [
-          ./nixos/configuration.nix
-          ./nixos/budgie-overlay.nix
-          home-manager.nixosModules.home-manager
-          {
-            home-manager = {
-              useGlobalPkgs = true;
-              useUserPackages = true;
-              extraSpecialArgs = { inherit inputs; };
-              users.alex = import ./home-manager/home.nix;
-            };
-          }
-        ];
+
+        Acer = nixpkgs.lib.nixosSystem {
+          inherit system specialArgs;
+          modules = [
+            ./nixos/hosts/Acer/configuration.nix
+            ./nixos/budgie-overlay.nix
+            home-manager.nixosModules.home-manager
+            (homeManagerModule {
+              VC = import ./home-manager/users/VC.nix;
+            })
+          ];
+        };
       };
     };
 }
