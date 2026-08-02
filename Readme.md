@@ -1,104 +1,74 @@
 # NixOS Config (Simple Guide)
 
-This repo is a flake-based NixOS setup with Home Manager integrated.
+This repository is a flake-based NixOS setup with Home Manager integrated.
 
-It currently defines:
-- Host: `hp`
-- User: `alex`
-- Main files:
-  - `flake.nix`
-  - `nixos/configuration.nix`
-  - `home-manager/home.nix`
+It defines two independent machine profiles:
 
-## What each file does
+| Flake host | Hostname | User | System module | Home Manager profile |
+| --- | --- | --- | --- | --- |
+| `hp` | `HP` | `alex` | `nixos/configuration.nix` | `home-manager/home.nix` |
+| `Acer` | `Acer` | `VC` | `nixos/hosts/Acer/configuration.nix` | `home-manager/users/VC.nix` |
 
-- `flake.nix`: wires everything together and defines `nixosConfigurations.hp`
-- `nixos/configuration.nix`: system settings (boot, desktop, services, users)
-- `nixos/hardware-configuration.nix`: hardware-specific settings for your machine
-- `home-manager/home.nix`: user packages and user-level config
-- `home-manager/modules/*`: extra Home Manager modules (espanso/proxy)
+Shared NixOS settings live in `nixos/common-configuration.nix`. Shared user packages and proxy tools live in `home-manager/common.nix`.
 
-## Quick start (local repo)
+Alex keeps the existing Espanso profile because `home-manager/modules/espanso.nix` contains Alex-specific names and signatures. VC receives the common packages and proxy module without inheriting those personal snippets.
 
-1. Clone this repo:
+## Important Acer hardware step
+
+The repository cannot safely infer Acer disk UUIDs, boot devices, CPU modules, or swap configuration from the existing HP profile. Therefore `nixos/hosts/Acer/hardware-configuration.nix` is deliberately only a safe template.
+
+On the Acer machine, generate and copy its real hardware configuration before switching:
 
 ```bash
-git clone https://github.com/drunkod/nixos-config.git ~/nixos-config
-cd ~/nixos-config
+sudo nixos-generate-config
+cp /etc/nixos/hardware-configuration.nix ./nixos/hosts/Acer/hardware-configuration.nix
 ```
 
-2. Back up your current NixOS config:
+Review the generated file and commit it to the Acer branch. Do not copy the HP hardware file: it contains HP-specific disk and CPU settings.
 
-```bash
-sudo cp -r /etc/nixos /etc/nixos.backup
-```
+## Build and test
 
-3. Copy your machine hardware config into this repo:
-
-```bash
-sudo cp /etc/nixos/hardware-configuration.nix ~/nixos-config/nixos/
-```
-
-4. Build and switch:
-
-```bash
-sudo nixos-rebuild switch --flake ~/nixos-config#hp
-```
-
-## Daily use
-
-- Test changes without switching:
+Test the existing HP configuration:
 
 ```bash
 sudo nixos-rebuild test --flake .#hp
 ```
 
-- Apply system + Home Manager changes:
+Test the Acer configuration after replacing its hardware template:
 
 ```bash
-sudo nixos-rebuild switch --flake .#hp
+sudo nixos-rebuild test --flake .#Acer
 ```
 
-- Roll back if needed:
+Apply after the test succeeds:
 
 ```bash
-sudo nixos-rebuild switch --rollback
+sudo nixos-rebuild switch --flake .#Acer
 ```
 
-## Where to edit
+## Main files
 
-- Add system packages: `nixos/configuration.nix` in `environment.systemPackages`
-- Add user packages: `home-manager/home.nix` in `home.packages`
-- Change hostname/timezone/user: `nixos/configuration.nix`
-
-After editing, run:
-
-```bash
-sudo nixos-rebuild switch --flake .#hp
-```
+- `flake.nix`: defines both NixOS configurations and connects each user profile.
+- `nixos/common-configuration.nix`: desktop, localization, services, packages, audio, printing, and networking shared by both hosts.
+- `nixos/configuration.nix`: HP-only hostname, user, boot configuration, and disk mount.
+- `nixos/hardware-configuration.nix`: generated HP hardware settings.
+- `nixos/hosts/Acer/configuration.nix`: Acer hostname and VC system user.
+- `nixos/hosts/Acer/hardware-configuration.nix`: replaceable Acer hardware template.
+- `home-manager/common.nix`: packages and proxy module shared by Alex and VC.
+- `home-manager/home.nix`: Alex identity and Alex-specific Espanso import.
+- `home-manager/users/VC.nix`: VC identity and home directory.
 
 ## Update dependencies
 
 ```bash
 nix flake update
-sudo nixos-rebuild switch --flake .#hp
+sudo nixos-rebuild test --flake .#Acer
 ```
 
-## Rebuild directly from GitHub (optional)
+## Rebuild directly from GitHub
+
+After the Acer hardware file has been committed:
 
 ```bash
-nix flake update
-sudo nixos-rebuild switch --flake github:drunkod/nix-simple-config#hp --refresh
-
+sudo nixos-rebuild test --flake github:drunkod/nix-simple-config/agent/add-acer-vc#Acer --refresh
 ```
-
-Use this when you do not want to clone locally.
-
-## Common problems
-
-- Error about missing hardware config:
-  - Ensure `nixos/hardware-configuration.nix` exists for this machine.
-- Syntax/build error:
-  - Run `sudo nixos-rebuild switch --flake .#hp --show-trace`
-- Home Manager service issue:
-  - Rebuild with full system command above (Home Manager is integrated into NixOS module).
