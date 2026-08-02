@@ -1,0 +1,139 @@
+{ pkgs, lib, zen-browser, pkgs-valent, ... }:
+
+let
+  ruLocale = "ru_RU.UTF-8";
+  ruLocaleCategories = [
+    "LC_ADDRESS"
+    "LC_IDENTIFICATION"
+    "LC_MEASUREMENT"
+    "LC_MONETARY"
+    "LC_NAME"
+    "LC_NUMERIC"
+    "LC_PAPER"
+    "LC_TELEPHONE"
+    "LC_TIME"
+  ];
+in
+{
+  # ── Nix ──────────────────────────────────────────────
+  nix.settings.experimental-features = [ "nix-command" "flakes" ];
+  nixpkgs.config.allowUnfree = true;
+
+  # ── Networking ───────────────────────────────────────
+  networking.networkmanager.enable = true;
+
+  # ── Localization ─────────────────────────────────────
+  time.timeZone = "Asia/Yekaterinburg";
+  i18n = {
+    defaultLocale = "en_US.UTF-8";
+    extraLocaleSettings = builtins.listToAttrs (map (cat: {
+      name = cat;
+      value = ruLocale;
+    }) ruLocaleCategories);
+  };
+
+  # ── Desktop & Display ───────────────────────────────
+  services.xserver = {
+    enable = true;
+    displayManager.lightdm.enable = true;
+    xkb = {
+      layout = "us";
+      variant = "";
+    };
+  };
+  services.desktopManager.budgie.enable = true;
+
+  environment.sessionVariables.XDG_CURRENT_DESKTOP = "Budgie:GNOME";
+
+  # ── XDG Portals ─────────────────────────────────────
+  xdg.portal = {
+    enable = true;
+    extraPortals = with pkgs; [
+      xdg-desktop-portal-gtk
+      xdg-desktop-portal-gnome
+    ];
+    config.common.default = [ "gtk" ];
+    config.budgie = {
+      default = [ "gtk" ];
+      "org.freedesktop.impl.portal.RemoteDesktop" = [ "gnome" ];
+      "org.freedesktop.impl.portal.ScreenCast" = [ "gnome" ];
+    };
+    config.gnome = {
+      default = [ "gtk" ];
+      "org.freedesktop.impl.portal.RemoteDesktop" = [ "gnome" ];
+      "org.freedesktop.impl.portal.ScreenCast" = [ "gnome" ];
+    };
+  };
+
+  # Keep graphical-session.target active in Budgie sessions so DBus can start
+  # xdg-desktop-portal-gnome.service without dependency timeouts.
+  systemd.user.targets.graphical-session.wantedBy = [ "default.target" ];
+
+  # Disable broken Budgie autostart entry with missing executable.
+  environment.etc."xdg/autostart/org.buddiesofbudgie.SettingsDaemon.DiskUtilityNotify.desktop".text = lib.mkForce ''
+    [Desktop Entry]
+    Type=Application
+    Name=Disable broken Budgie DiskUtilityNotify autostart
+    Hidden=true
+  '';
+
+  # ── Audio ────────────────────────────────────────────
+  services.pulseaudio.enable = false;
+  security.polkit = {
+    enable = true;
+    extraConfig = ''
+      polkit.addRule(function(action, subject) {
+        var udisksActions = [
+          "org.freedesktop.udisks2.filesystem-mount",
+          "org.freedesktop.udisks2.filesystem-mount-system",
+          "org.freedesktop.udisks2.filesystem-mount-other-seat",
+          "org.freedesktop.udisks2.filesystem-unmount-others",
+          "org.freedesktop.udisks2.encrypted-unlock",
+          "org.freedesktop.udisks2.eject-media",
+          "org.freedesktop.udisks2.power-off-drive"
+        ];
+
+        if (udisksActions.indexOf(action.id) >= 0 && subject.isInGroup("wheel")) {
+          return polkit.Result.YES;
+        }
+      });
+    '';
+  };
+  security.rtkit.enable = true;
+  services.pipewire = {
+    enable = true;
+    alsa = {
+      enable = true;
+      support32Bit = true;
+    };
+    pulse.enable = true;
+  };
+
+  # ── Printing ─────────────────────────────────────────
+  services.printing = {
+    enable = true;
+    drivers = with pkgs; [ hplip hplipWithPlugin ];
+  };
+  services.system-config-printer.enable = true;
+  programs.system-config-printer.enable = true;
+
+  # ── Other Services ──────────────────────────────────
+  services.udisks2.enable = true;
+  services.fwupd.enable = true;
+  services.gnome.gnome-keyring.enable = true;
+
+  # ── Programs ─────────────────────────────────────────
+  programs.kdeconnect = {
+    enable = true;
+    package = pkgs-valent.valent;
+  };
+
+  # ── System Packages ─────────────────────────────────
+  environment.systemPackages = [
+    pkgs.git
+    pkgs.android-tools
+    zen-browser.packages.${pkgs.system}.default
+  ];
+
+  system.stateVersion = "25.05";
+}
